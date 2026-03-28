@@ -1,0 +1,5 @@
+{
+  "infoPlist": {
+    "NSCameraUsageDescription": "QRコードをスキャンして友達を追加するためにカメラを使用します。"
+  }
+}

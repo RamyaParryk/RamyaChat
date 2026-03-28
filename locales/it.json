@@ -1,0 +1,5 @@
+{
+  "infoPlist": {
+    "NSCameraUsageDescription": "Usiamo la fotocamera per scansionare i codici QR e aggiungere amici."
+  }
+}

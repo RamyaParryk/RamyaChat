@@ -1,0 +1,5 @@
+{
+  "infoPlist": {
+    "NSCameraUsageDescription": "Arkadaş eklemek için QR kodlarını taramak amacıyla kamerayı kullanıyoruz."
+  }
+}

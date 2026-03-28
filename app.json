@@ -7,24 +7,74 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png", 
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
+    },
+    "locales": {
+      "ja": "./locales/ja.json",
+      "en": "./locales/en.json",
+      "es": "./locales/es.json",
+      "de": "./locales/de.json",
+      "hi": "./locales/hi.json",
+      "zh": "./locales/zh.json",
+      "ko": "./locales/ko.json",
+      "th": "./locales/th.json",
+      "vi": "./locales/vi.json",
+      "fr": "./locales/fr.json",
+      "pt": "./locales/pt.json",
+      "it": "./locales/it.json",
+      "ru": "./locales/ru.json",
+      "id": "./locales/id.json",
+      "tr": "./locales/tr.json"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#ffffff"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ratolab.ramyachat",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-secure-store",
+      "expo-splash-screen",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "We use the camera to scan QR codes to add friends."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification.png",
+          "color": "#A020F0"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e43cc4c4-b299-4b48-9f3b-f93ac7872706"
+      }
     }
   }
 }

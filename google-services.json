@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "297422740044",
+    "project_id": "ramyachat-260313",
+    "storage_bucket": "ramyachat-260313.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297422740044:android:4f9dd968c1165f54d3f2e9",
+        "android_client_info": {
+          "package_name": "com.ratolab.ramyachat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKlFWGYiB7wjkCNYOpDQhBFGfGV0jB9-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

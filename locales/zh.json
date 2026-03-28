@@ -1,0 +1,5 @@
+{
+  "infoPlist": {
+    "NSCameraUsageDescription": "我们使用相机扫描二维码以添加好友。"
+  }
+}
