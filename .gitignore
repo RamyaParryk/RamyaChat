@@ -42,3 +42,4 @@ yarn-error.*
 
 # API Keyなど
 .env
+google-services.json
