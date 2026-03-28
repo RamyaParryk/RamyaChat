@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
@@ -10,7 +10,7 @@ export default function AboutScreen({ navigation }: any) {
   const { theme } = useTheme();
   const { colors } = theme;
 
-const renderFaqItem = (question: any, answer: any) => (
+  const renderFaqItem = (question: any, answer: any) => (
     <View style={[styles.faqItem, { borderBottomColor: colors.border }]}>
       <Text style={[styles.faqQuestion, { color: colors.text }]}>{t(question)}</Text>
       <Text style={[styles.faqAnswer, { color: colors.secondaryText }]}>{t(answer)}</Text>
@@ -40,14 +40,18 @@ const renderFaqItem = (question: any, answer: any) => (
           <Text style={[styles.version, { color: colors.secondaryText }]}>{t('appVersion')} {packageJson.version}</Text>
         </View>
 
-        {/* 🌟 開発者情報 */}
+        {/* 🌟 開発者情報 (RatoLab Branding) */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t('developer')}</Text>
-          <Text style={[styles.developerName, { color: colors.text }]}>Rato Lab</Text>
+          <Text style={[styles.developerName, { color: colors.text }]}>RatoLab (TomatoJuice)</Text>
         </View>
 
-        {/* 🌟 リンク集 */}
+        {/* 🌟 リンク集 (GitHub 公式ページを追加) */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, paddingVertical: 5 }]}>
+          {/* 🌟 公式プロジェクトページ */}
+          {renderLinkItem("logo-github", "officialProjectPage", () => Linking.openURL('https://ramyaparryk.github.io/RamyaChat/'))}
+          
+          {/* 利用規約とプライバシーポリシー */}
           {renderLinkItem("document-text-outline", "termsOfService", () => Linking.openURL('https://ramyachat-260313.web.app/terms.html'))}
           {renderLinkItem("shield-checkmark-outline", "privacyPolicy", () => Linking.openURL('https://ramyachat-260313.web.app/privacy.html'))}
         </View>
@@ -55,19 +59,19 @@ const renderFaqItem = (question: any, answer: any) => (
         {/* 🌟 FAQ / ヘルプセクション：基本 */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('helpAndFaq')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
-          {renderFaqItem('faq1Q', 'faq1A')} {/* 音声再生について */}
-          {renderFaqItem('faq2Q', 'faq2A')} {/* 友達追加について */}
-          {renderFaqItem('faq3Q', 'faq3A')} {/* 串刺し検索について */}
+          {renderFaqItem('faq1Q', 'faq1A')}
+          {renderFaqItem('faq2Q', 'faq2A')}
+          {renderFaqItem('faq3Q', 'faq3A')}
         </View>
 
         {/* 🌟 FAQ / ヘルプセクション：容量・保存 */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('limitsAndPrivacy')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
-          {renderFaqItem('faq4Q', 'faq4A')} {/* 10MB制限について */}
-          {renderFaqItem('faq5Q', 'faq5A')} {/* 一時保存とローカル保存推奨 */}
+          {renderFaqItem('faq4Q', 'faq4A')}
+          {renderFaqItem('faq5Q', 'faq5A')}
         </View>
 
-        <Text style={styles.copyright}>© 2026 Rato Lab. All rights reserved.</Text>
+        <Text style={styles.copyright}>© 2026 RatoLab (TomatoJuice). All rights reserved.</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -83,7 +87,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: 15, padding: 15, marginBottom: 20, borderWidth: 1 },
   sectionTitle: { fontSize: 12, fontWeight: 'bold', marginBottom: 5, textTransform: 'uppercase' },
   developerName: { fontSize: 18, fontWeight: '500' },
-  linkItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: StyleSheet.hairlineWidth },
+  linkItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, marginHorizontal: 15, borderBottomWidth: StyleSheet.hairlineWidth },
   linkTitle: { fontSize: 16 },
   sectionHeading: { fontSize: 14, fontWeight: 'bold', marginLeft: 10, marginBottom: 10, textTransform: 'uppercase' },
   faqItem: { padding: 15, borderBottomWidth: StyleSheet.hairlineWidth },
