@@ -3,7 +3,8 @@
 
 [日本語版はこちら (Japanese Version)](./README_ja.md)
 
-RamyaChat is a minimalist, beautiful, and cross-platform real-time chat application. It is designed to provide a seamless messaging experience across different devices and environments.
+RamyaChat is a simple real-time chat application.
+It was developed with the goal of providing a seamless messaging experience.
 
 ## ✨ Key Features
 
