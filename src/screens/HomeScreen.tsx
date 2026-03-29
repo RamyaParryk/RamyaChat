@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../utils/translator';
 import { useTheme } from '../contexts/ThemeContext';
 import { apiClient } from '../utils/api';
+import AdBanner from '../components/AdBanner';
 
 // @ts-ignore
 const socket = io(process.env.EXPO_PUBLIC_API_URL, { autoConnect: false });
@@ -174,6 +175,10 @@ export default function HomeScreen({ route, navigation }) {
           }
         />
       )}
+
+      {/* 🌟 画面の一番下に広告を配置*/}
+      <AdBanner />
+      
     </SafeAreaView>
   );
 }

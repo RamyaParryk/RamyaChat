@@ -6,7 +6,6 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker'; 
 import * as SecureStore from 'expo-secure-store';
 import * as ImageManipulator from 'expo-image-manipulator';
-// 🌟 Web用の切り取りライブラリを追加
 import Cropper from 'react-easy-crop';
 
 import { auth, db } from '../utils/firebaseConfig';
@@ -17,6 +16,7 @@ import { ThemeType } from '../styles/themes';
 import { useLanguage } from '../contexts/LanguageContext';
 import { apiClient } from '../utils/api';
 import { Ionicons } from '@expo/vector-icons';
+import AdBanner from '../components/AdBanner';
 
 // @ts-ignore
 export default function SettingsScreen({ navigation }) {
@@ -183,7 +183,6 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const handleResetPassword = async () => {
-    // ... 既存コードと全く同じ ...
     if (auth.currentUser && auth.currentUser.email) {
       try {
         await sendPasswordResetEmail(auth, auth.currentUser.email);
@@ -204,7 +203,6 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const handleUpdateEmail = async () => {
-    // ... 既存コードと全く同じ ...
     if (!newEmail || !auth.currentUser) return;
     try {
       await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
@@ -222,7 +220,6 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const performLogout = async () => {
-    // ... 既存コードと全く同じ ...
     try {
       await signOut(auth);
       if (Platform.OS === 'web') {
@@ -239,7 +236,6 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const handleLogout = () => {
-    // ... 既存コードと全く同じ ...
     if (Platform.OS === 'web') {
       const confirmed = window.confirm(t('logoutConfirmMessage'));
       if (confirmed) performLogout();
@@ -370,6 +366,10 @@ export default function SettingsScreen({ navigation }) {
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutButtonText}>{t('logoutButton')}</Text>
           </TouchableOpacity>
+
+          {/* 🌟 設定画面の最下部（ログアウトボタンの下）に広告を配置 */}
+          <AdBanner />
+
         </View>
 
         {/* 🌟 Web用の切り取りモーダル */}
@@ -386,7 +386,7 @@ export default function SettingsScreen({ navigation }) {
                     image={selectedWebImage}
                     crop={crop}
                     zoom={zoom}
-                    aspect={1} // 1:1の正方形に固定
+                    aspect={1} 
                     onCropChange={setCrop}
                     onCropComplete={onCropComplete}
                     onZoomChange={setZoom}
@@ -418,7 +418,6 @@ export default function SettingsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // ... (既存のスタイルはすべてそのまま) ...
   scrollContainer: { alignItems: 'center', padding: 20, paddingBottom: 50 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 30 },
   avatarContainer: { position: 'relative', marginBottom: 15 },
@@ -447,7 +446,7 @@ const styles = StyleSheet.create({
   logoutButton: { backgroundColor: '#FF3B30', paddingVertical: 15, paddingHorizontal: 40, borderRadius: 25, width: '100%', alignItems: 'center', marginTop: 15 },
   logoutButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 
-  // 🌟 Web用モーダルのスタイル（追加分）
+  // 🌟 Web用モーダルのスタイル
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { width: '90%', maxWidth: 500, padding: 20, borderRadius: 15, alignItems: 'center' },
   cropContainer: { width: '100%', height: 300, position: 'relative', backgroundColor: '#333', borderRadius: 10, overflow: 'hidden', marginBottom: 20 },

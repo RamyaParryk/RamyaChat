@@ -43,10 +43,10 @@ export default function AboutScreen({ navigation }: any) {
         {/* 🌟 開発者情報 (RatoLab Branding) */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t('developer')}</Text>
-          <Text style={[styles.developerName, { color: colors.text }]}>RatoLab (TomatoJuice)</Text>
+          <Text style={[styles.developerName, { color: colors.text }]}>RatoLab</Text>
         </View>
 
-        {/* 🌟 リンク集 (GitHub 公式ページを追加) */}
+        {/* 🌟 リンク集 */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, paddingVertical: 5 }]}>
           {/* 🌟 公式プロジェクトページ */}
           {renderLinkItem("logo-github", "officialProjectPage", () => Linking.openURL('https://ramyaparryk.github.io/RamyaChat/'))}

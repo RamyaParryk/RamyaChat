@@ -13,6 +13,8 @@ import Constants from 'expo-constants';
 // 🌟 APIクライアントとテーマシステムをインポート！
 import { apiClient } from '../utils/api';
 import { useTheme } from '../contexts/ThemeContext';
+// 🌟 広告コンポーネントをインポート！
+import AdBanner from '../components/AdBanner';
 
 // 🌟 通知の受け取り設定
 Notifications.setNotificationHandler({
@@ -352,6 +354,9 @@ export default function FriendsScreen({ route, navigation }: any) {
           )}
         </View>
       </Modal>
+
+      {/* 🌟 画面の一番下に広告を配置 */}
+      <AdBanner />
 
     </View>
   );
