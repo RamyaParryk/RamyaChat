@@ -14,11 +14,13 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import FriendsScreen from './src/screens/FriendsScreen';
 import AboutScreen from './src/screens/AboutScreen';
+import LanguageSelectScreen from './src/screens/LanguageSelectScreen';
+// 🌟 通報画面を追加インポート
+import ReportScreen from './src/screens/ReportScreen'; 
 
 import { t } from './src/utils/translator'; 
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { LanguageProvider, useLanguage } from './src/contexts/LanguageContext';
-import LanguageSelectScreen from './src/screens/LanguageSelectScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -166,6 +168,16 @@ function AppInner() {
           <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'RamyaChat', headerBackTitle: t('backButton') }} />
           <Stack.Screen name="About" component={AboutScreen} options={{ title: t('aboutApp'), headerBackTitle: t('backButton') }} />
           <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} options={{ title: t('languageChangeTitle') || '言語の変更', headerBackTitle: t('backButton') }} />
+          
+          {/* 🌟 通報画面のルーティング */}
+          <Stack.Screen 
+            name="ReportScreen" 
+            component={ReportScreen} 
+            options={{ 
+              title: t('report_title') || '問題を報告する', 
+              headerBackTitle: t('backButton') 
+            }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
