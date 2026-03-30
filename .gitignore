@@ -46,6 +46,4 @@ yarn-error.*
 google-services.json
 
 # others
-RamyaChat-Server/
-src/
 app.json
