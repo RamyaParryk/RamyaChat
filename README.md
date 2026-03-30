@@ -28,9 +28,9 @@ It was developed with the goal of providing a seamless messaging experience.
 
 ## 👨‍💻 Developer Information
 
-* **Production**: **RatoLab (TomatoJuice)**
+* **Production**: **RatoLab**
 * **Lead Developer**: @ramyaparryk
-* **Location**: Itabashi, Tokyo, Japan.
+* **Location**: Japan.
 
 ## 📄 Documentation
 
