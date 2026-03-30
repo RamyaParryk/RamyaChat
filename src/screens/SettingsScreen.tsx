@@ -426,7 +426,7 @@ export default function SettingsScreen({ navigation }) {
             <Text style={styles.logoutButtonText}>{t('logoutButton')}</Text>
           </TouchableOpacity>
 
-          {/* 🌟 アカウント削除ボタンを追加（赤枠で警告っぽく） */}
+          {/* 🌟 アカウント削除ボタン */}
           <TouchableOpacity 
             style={[styles.outlineButton, { borderColor: '#FF3B30', backgroundColor: colors.card, marginTop: 40 }]} 
             onPress={handleDeleteAccount}

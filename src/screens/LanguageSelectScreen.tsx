@@ -22,6 +22,8 @@ const LANGUAGES = [
   { label: 'Italiano', code: 'it' },
   { label: 'Bahasa Indonesia', code: 'id' },
   { label: 'Türkçe', code: 'tr' },
+  { label: 'العربية', code: 'ar' },
+  { label: 'فارسی', code: 'fa' },
 ];
 
 // @ts-ignore
