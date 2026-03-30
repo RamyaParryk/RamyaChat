@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Localization from 'expo-localization'; // 📱 端末の言語設定を取得するために追加
+import * as Localization from 'expo-localization';
 import { setAppLanguage } from '../utils/translator';
 
 // Contextで管理するデータの型定義
@@ -14,8 +14,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // アプリ全体を包むProviderコンポーネント
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  // 💡 【修正ポイント1】初期値を 'ja' 固定ではなく、端末の言語から取得する
-  // getLocales()[0].languageCode は 'en', 'ja' などを返します
+  // 初期値を 'ja' 固定ではなく、端末の言語から取得する
+  // getLocales()[0].languageCode は 'en', 'ja' などを返す
   const defaultDeviceLang = Localization.getLocales()[0]?.languageCode ?? 'en';
   const [language, setLanguage] = useState<string>(defaultDeviceLang);
 
