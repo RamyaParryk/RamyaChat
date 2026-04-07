@@ -1,4 +1,3 @@
-// routes/friends.js
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
@@ -17,8 +16,8 @@ router.get('/search-users', async (req, res) => {
       AND u.deleted_at IS NULL     -- 🌟 削除されていない人限定
       AND NOT EXISTS (
         SELECT 1 FROM friendships f
-        WHERE (f.user_id = u.user_id AND f.friend_id = (SELECT user_id FROM users WHERE username = $2 AND is_active = true))
-           OR (f.friend_id = u.user_id AND f.user_id = (SELECT user_id FROM users WHERE username = $2 AND is_active = true))
+        WHERE (f.user_id = u.user_id AND f.friend_id = (SELECT user_id FROM users WHERE username = $2))
+           OR (f.friend_id = u.user_id AND f.user_id = (SELECT user_id FROM users WHERE username = $2))
       )
       LIMIT 20
     `, [`%${q}%`, currentUsername]);

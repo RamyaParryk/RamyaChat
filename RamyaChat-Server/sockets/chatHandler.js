@@ -1,4 +1,3 @@
-// sockets/chatHandler.js
 const pool = require('../config/db');
 const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
 const translations = require('../utils/translations.json');
@@ -60,9 +59,7 @@ module.exports = function(io) {
   io.on('connection', (socket) => {
     console.log(`🔌 User connected ${socket.id}`);
 
-    // 🌟 文字列でもオブジェクトでも安全に受け取ってDB登録する最強版
     socket.on('user_online', async (data) => {
-      // データの形に合わせて安全に取り出す
       const username = typeof data === 'string' ? data : (data.username || data._id);
       const displayName = typeof data === 'object' ? (data.name || data.displayName) : username;
       const avatarUrl = typeof data === 'object' ? data.avatar : `${baseUrl}/avatars/default.png`;
@@ -98,7 +95,12 @@ module.exports = function(io) {
           UPDATE messages SET is_read = TRUE
           WHERE room_id = $1 AND sender_id != (SELECT user_id FROM users WHERE username = $2) AND is_read = FALSE
         `, [roomId, userId]);
-        socket.to(roomId).emit('messages_read');
+        
+        // 🌟 相手の個人Socket宛に既読通知を送る
+        const usersInRoom = roomId.split('_');
+        const partnerId = usersInRoom[0] === userId ? usersInRoom[1] : usersInRoom[0];
+        if (partnerId) io.to(partnerId).emit('messages_read', { roomId });
+        socket.to(roomId).emit('messages_read', { roomId });
         
         let query = '';
         let params = [roomId];
@@ -185,6 +187,7 @@ module.exports = function(io) {
       }
 
       data.createdAt = new Date().toISOString();
+      data.isRead = false; // 🌟 修正2：クライアントに未読状態であることを明記
       const roomId = data.roomId;
       await saveMessageToDB(data, roomId);
       
@@ -225,7 +228,12 @@ module.exports = function(io) {
     socket.on('mark_as_read', async ({ roomId, userId }) => {
       try {
         await pool.query(`UPDATE messages SET is_read = TRUE WHERE room_id = $1 AND sender_id != (SELECT user_id FROM users WHERE username = $2) AND is_read = FALSE`, [roomId, userId]);
-        socket.to(roomId).emit('messages_read');
+        
+        // 🌟 修正1：相手の個人Socket宛に既読通知を送る
+        const usersInRoom = roomId.split('_');
+        const partnerId = usersInRoom[0] === userId ? usersInRoom[1] : usersInRoom[0];
+        if (partnerId) io.to(partnerId).emit('messages_read', { roomId });
+        socket.to(roomId).emit('messages_read', { roomId });
       } catch (err) { console.error('❌ Read update error', err); }
     });
 

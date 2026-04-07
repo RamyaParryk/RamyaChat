@@ -25,7 +25,7 @@ if (Platform.OS === 'web') {
   // Webブラウザの場合は標準の getAuth を使う
   auth = firebaseAuth.getAuth(app);
 } else {
-  // 🌟 ここはFirebase側の型バグを回避するため、あえて `as any` を使って突破するわ！
+  // 🌟 ここはFirebase側の型バグを回避するため、あえて `as any` を使って突破
   const reactNativePersistence = (firebaseAuth as any).getReactNativePersistence;
   auth = firebaseAuth.initializeAuth(app, {
     persistence: reactNativePersistence(AsyncStorage)

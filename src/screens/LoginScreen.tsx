@@ -168,16 +168,35 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const handleForgotPassword = async () => {
+const handleForgotPassword = async () => {
+    console.log("🔘 パスワードリセットボタンが押されました！ Email:", email);
     if (!email) {
-      Alert.alert(t('notice') || "お知らせ", t('enterEmailForReset'));
+      if (Platform.OS === 'web') {
+        window.alert(t('enterEmailForReset'));
+      } else {
+        Alert.alert(t('notice'), t('enterEmailForReset'));
+      }
       return;
     }
+
     try {
+      console.log("⏳ Firebaseへ送信処理開始...");
       await sendPasswordResetEmail(auth, email);
-      Alert.alert(t('success') || "成功", t('resetEmailSent'));
+      console.log("✅ 送信成功！");
+
+      if (Platform.OS === 'web') {
+        window.alert(t('resetEmailSent'));
+      } else {
+        Alert.alert(t('success'), t('resetEmailSent'));
+      }
     } catch (error: any) {
-      Alert.alert(t('error') || "エラー", error.message);
+      console.error("❌ 送信エラー発生:", error);
+
+      if (Platform.OS === 'web') {
+        window.alert(`${t('error')}: ${t('resetPasswordError')}`);
+      } else {
+        Alert.alert(t('error'), t('resetPasswordError'));
+      }
     }
   };
 
