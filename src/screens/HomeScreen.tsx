@@ -70,8 +70,7 @@ export default function HomeScreen({ route, navigation }) {
   useEffect(() => {
     socket.connect();
     
-    // 🌟 これを追加！接続した瞬間に「私ログインしたよ！」とサーバーに伝える
-    // これによって chatHandler.js が動き、DBにユーザーが実体化されます！
+    // 🌟 接続した瞬間に「私ログインしたよ！」とサーバーに伝える
     if (currentUser && currentUser.username) {
       console.log(`📡 Socket emitting user_online for: ${currentUser.username}`);
       socket.emit('user_online', currentUser);
@@ -148,7 +147,7 @@ export default function HomeScreen({ route, navigation }) {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       
       <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Ionicons name="search" size={20} color={colors.secondaryText} style={styles.searchIcon} />

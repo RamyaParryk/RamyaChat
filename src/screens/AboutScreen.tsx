@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { t } from '../utils/translator';
 import packageJson from '../../package.json';
+import AdBanner from '../components/AdBanner'; // 🌟 インポート
 
 export default function AboutScreen({ navigation }: any) {
   const { theme } = useTheme();
@@ -28,10 +29,8 @@ export default function AboutScreen({ navigation }: any) {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom', 'left', 'right']}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
-        {/* 🌟 アプリのロゴと基本情報 */}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} style={{ flex: 1 }}>
         <View style={styles.headerSection}>
           <View style={[styles.logoContainer, { backgroundColor: colors.primary }]}>
             <Ionicons name="chatbubbles" size={60} color="#fff" />
@@ -40,23 +39,17 @@ export default function AboutScreen({ navigation }: any) {
           <Text style={[styles.version, { color: colors.secondaryText }]}>{t('appVersion')} {packageJson.version}</Text>
         </View>
 
-        {/* 🌟 開発者情報 (RatoLab Branding) */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t('developer')}</Text>
           <Text style={[styles.developerName, { color: colors.text }]}>RatoLab</Text>
         </View>
 
-        {/* 🌟 リンク集 */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, paddingVertical: 5 }]}>
-          {/* 🌟 公式プロジェクトページ */}
           {renderLinkItem("logo-github", "officialProjectPage", () => Linking.openURL('https://ramyaparryk.github.io/RamyaChat/'))}
-          
-          {/* 利用規約とプライバシーポリシー */}
           {renderLinkItem("document-text-outline", "termsOfService", () => Linking.openURL('https://ramyachat-260313.web.app/terms.html'))}
           {renderLinkItem("shield-checkmark-outline", "privacyPolicy", () => Linking.openURL('https://ramyachat-260313.web.app/privacy.html'))}
         </View>
 
-        {/* 🌟 FAQ / ヘルプセクション：基本 */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('helpAndFaq')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
           {renderFaqItem('faq1Q', 'faq1A')}
@@ -64,7 +57,6 @@ export default function AboutScreen({ navigation }: any) {
           {renderFaqItem('faq3Q', 'faq3A')}
         </View>
 
-        {/* 🌟 FAQ / ヘルプセクション：容量・保存 */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('limitsAndPrivacy')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
           {renderFaqItem('faq4Q', 'faq4A')}
@@ -73,7 +65,11 @@ export default function AboutScreen({ navigation }: any) {
 
         <Text style={styles.copyright}>© 2026 RatoLab (TomatoJuice). All rights reserved.</Text>
       </ScrollView>
-    </SafeAreaView>
+
+      {/* 🌟 画面下部に広告を固定 */}
+      <AdBanner />
+
+    </View>
   );
 }
 
@@ -81,7 +77,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: { padding: 20, paddingBottom: 40 },
   headerSection: { alignItems: 'center', marginBottom: 30, marginTop: 10 },
-  logoContainer: { width: 100, height: 100, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 5, elevation: 5 },
+  logoContainer: { width: 100, height: 100, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 15, elevation: 5 },
   appName: { fontSize: 26, fontWeight: 'bold', marginBottom: 5 },
   version: { fontSize: 14 },
   card: { borderRadius: 15, padding: 15, marginBottom: 20, borderWidth: 1 },
