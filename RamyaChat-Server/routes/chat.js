@@ -1,22 +1,20 @@
-// routes/chat.js
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
 
 /* ================================
-   🌟 チャット履歴のクリア（自分側だけ非表示）
+   🌟 チャット履歴のクリア
 ================================ */
 router.post('/clear-chat', async (req, res) => {
   const { roomId, username } = req.body;
   if (!roomId || !username) return res.status(400).json({ error: 'Missing parameters' });
 
   try {
-    // ルームID (例: userA_userB) を分割して、自分がどちら側か判定してクリア時間を記録
-    const users = roomId.split('_');
-    if (users[0] === username) {
+    // 🌟 自分の名前_ から始まるかどうかで判定
+    if (roomId.startsWith(username + '_')) {
       await pool.query('UPDATE rooms SET user1_cleared_at = NOW() WHERE room_id = $1', [roomId]);
-    } else if (users[1] === username) {
+    } else {
       await pool.query('UPDATE rooms SET user2_cleared_at = NOW() WHERE room_id = $1', [roomId]);
     }
     res.json({ success: true });
@@ -27,7 +25,7 @@ router.post('/clear-chat', async (req, res) => {
 });
 
 /* ================================
-   DM List API (履歴クリア対応版)
+   DM List API
 ================================ */
 router.get('/dm-list/:username', async (req, res) => {
   const username = req.params.username;
@@ -60,8 +58,8 @@ router.get('/dm-list/:username', async (req, res) => {
             -- 🌟 未読バッジもクリア時間以降のものだけカウント
             AND m2.timestamp >= COALESCE(
               (SELECT CASE 
-                        WHEN split_part(r.room_id, '_', 1) = $1 THEN r.user1_cleared_at
-                        WHEN split_part(r.room_id, '_', 2) = $1 THEN r.user2_cleared_at
+                        WHEN left(r.room_id, length($1) + 1) = $1 || '_' THEN r.user1_cleared_at
+                        ELSE r.user2_cleared_at
                       END 
                FROM rooms r WHERE r.room_id = m.room_id),
               '1970-01-01'::timestamp
@@ -75,13 +73,15 @@ router.get('/dm-list/:username', async (req, res) => {
           ELSE left(m.room_id, length(m.room_id) - length($1) - 1)
         END
       )
-      WHERE m.room_id LIKE '%' || $1 || '%'
+      WHERE 
+        -- 🌟 幽霊チャット防止＆複数アンダーバー完全対応の完璧な条件式
+        (left(m.room_id, length($1) + 1) = $1 || '_' OR right(m.room_id, length($1) + 1) = '_' || $1)
         AND m.deleted_at IS NULL
-        -- 🌟 最新メッセージがクリア時間より新しい部屋だけをリストに出す！
+        -- 🌟 最新メッセージがクリア時間より新しい部屋だけをリストに出す
         AND m.timestamp >= COALESCE(
           (SELECT CASE 
-                    WHEN split_part(r.room_id, '_', 1) = $1 THEN r.user1_cleared_at
-                    WHEN split_part(r.room_id, '_', 2) = $1 THEN r.user2_cleared_at
+                    WHEN left(r.room_id, length($1) + 1) = $1 || '_' THEN r.user1_cleared_at
+                    ELSE r.user2_cleared_at
                   END 
            FROM rooms r WHERE r.room_id = m.room_id),
           '1970-01-01'::timestamp
@@ -112,14 +112,13 @@ router.get('/dm-list/:username', async (req, res) => {
 });
 
 /* ================================
-   Search Messages API (変更なし)
+   Search Messages API
 ================================ */
 router.get('/search-messages', async (req, res) => {
   const { currentUsername, q } = req.query;
   if (!currentUsername || !q) return res.json([]);
 
   try {
-    // 🌟 串刺し検索は cleared_at を無視するため、過去の履歴もしっかりヒット
     const result = await pool.query(`
       SELECT 
         m.message_id, m.room_id, m.text, m.timestamp,
@@ -128,7 +127,10 @@ router.get('/search-messages', async (req, res) => {
       FROM messages m
       LEFT JOIN users target_u ON target_u.username = (CASE WHEN left(m.room_id, length($1) + 1) = $1 || '_' THEN right(m.room_id, length(m.room_id) - length($1) - 1) ELSE left(m.room_id, length(m.room_id) - length($1) - 1) END)
       LEFT JOIN users sender_u ON m.sender_id = sender_u.user_id
-      WHERE m.room_id LIKE '%' || $1 || '%' AND m.text ILIKE $2
+      WHERE 
+        -- 🌟 幽霊チャット防止＆複数アンダーバー完全対応
+        (left(m.room_id, length($1) + 1) = $1 || '_' OR right(m.room_id, length($1) + 1) = '_' || $1)
+        AND m.text ILIKE $2
       ORDER BY m.timestamp DESC LIMIT 50
     `, [currentUsername, `%${q}%`]);
       
@@ -141,7 +143,7 @@ router.get('/search-messages', async (req, res) => {
     });
     res.json(searchResults);
   } catch (err) {
-    console.error(`❌ Message search error`, err);
+    console.error(`❌ Message search error for ${currentUsername}`, err);
     res.status(500).json({ error: 'DB error' });
   }
 });
