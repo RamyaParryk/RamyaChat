@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator, TextInput } from 'react-native'; 
+// 🌟 Modal と TouchableWithoutFeedback を追加しました
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator, TextInput, Modal, TouchableWithoutFeedback } from 'react-native'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native'; 
 import { io } from 'socket.io-client'; 
@@ -23,6 +24,10 @@ export default function HomeScreen({ route, navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  
+  // モーダル用のState
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
 
   const fetchDMList = async () => {
     if (!currentUser?.username) return;
@@ -42,6 +47,24 @@ export default function HomeScreen({ route, navigation }) {
       fetchDMList();
     }, [currentUser?.username])
   );
+
+  // 🌟 履歴クリアAPIを叩く処理（useEffectの外に出しました）
+  const handleClearChatHistory = async () => {
+    if (!selectedRoom) return;
+    setIsMenuVisible(false); // モーダルを閉じる
+    try {
+      // バックエンドのクリア用APIを呼び出す
+      await apiClient.post('/clear-chat', {
+        roomId: selectedRoom.room_id,
+        username: currentUser.username
+      });
+      // 成功したらリストを再取得して画面から消す
+      fetchDMList();
+    } catch (error) {
+      console.error('履歴の削除に失敗しました:', error);
+      alert(t('error') || '削除に失敗しました');
+    }
+  };
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -66,11 +89,10 @@ export default function HomeScreen({ route, navigation }) {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, currentUser.username]);
 
-  // 🌟 ここが一番重要！Socket通信のセットアップ
+  // 🌟 Socket通信のセットアップ
   useEffect(() => {
     socket.connect();
     
-    // 🌟 接続した瞬間に「私ログインしたよ！」とサーバーに伝える
     if (currentUser && currentUser.username) {
       console.log(`📡 Socket emitting user_online for: ${currentUser.username}`);
       socket.emit('user_online', currentUser);
@@ -84,7 +106,7 @@ export default function HomeScreen({ route, navigation }) {
       socket.off('dm_list_update');
       socket.disconnect();
     };
-  }, [currentUser]); // 🌟 currentUser がセットされたら走るように依存配列に追加
+  }, [currentUser]); 
 
   useEffect(() => {
     navigation.setOptions({
@@ -124,8 +146,16 @@ export default function HomeScreen({ route, navigation }) {
             targetMessageId: isSearchResult ? item.message_id : null
           });
         }}
+        // 🌟 長押しでモーダルを開く
+        onLongPress={() => {
+          // 検索結果の時は削除できないようにする
+          if (!isSearchResult) {
+            setSelectedRoom(item);
+            setIsMenuVisible(true);
+          }
+        }}
       >
-      <Image source={{ uri: partner.avatar || `${process.env.EXPO_PUBLIC_API_URL}/avatars/default.png` }} style={styles.avatar} />
+        <Image source={{ uri: partner.avatar || `${process.env.EXPO_PUBLIC_API_URL}/avatars/default.png` }} style={styles.avatar} />
         <View style={styles.userInfo}>
           <View style={styles.nameTimeRow}>
             <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>{partner.display_name}</Text>
@@ -184,6 +214,28 @@ export default function HomeScreen({ route, navigation }) {
         />
       )}
 
+      {/* 🌟 長押しメニュー（モーダル）を追加しました */}
+      <Modal visible={isMenuVisible} transparent={true} animationType="fade" onRequestClose={() => setIsMenuVisible(false)}>
+        <TouchableWithoutFeedback onPress={() => setIsMenuVisible(false)}>
+          <View style={styles.menuOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.menuContainer, { backgroundColor: colors.card }]}>
+                <Text style={[styles.menuTitle, { color: colors.secondaryText }]}>
+                  {selectedRoom?.user?.display_name} {t('chatMenuTitle') || 'とのトーク'}
+                </Text>
+                
+                <TouchableOpacity style={styles.menuItem} onPress={handleClearChatHistory}>
+                  <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+                  <Text style={[styles.menuItemText, { color: '#FF3B30' }]}>
+                    {t('clearChatHistory') || 'トーク履歴を削除'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
       {/* 🌟 画面の一番下に広告を配置*/}
       <AdBanner />
       
@@ -217,4 +269,11 @@ const styles = StyleSheet.create({
   badge: { minWidth: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 6, marginLeft: 10 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
   emptyText: { textAlign: 'center', marginTop: 50 },
+
+  // 🌟 モーダル用のスタイルを追加しました
+  menuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
+  menuContainer: { width: 280, borderRadius: 16, paddingVertical: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 },
+  menuTitle: { fontSize: 14, fontWeight: 'bold', textAlign: 'center', paddingVertical: 15 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20 },
+  menuItemText: { fontSize: 16, fontWeight: 'bold', marginLeft: 15 },
 });

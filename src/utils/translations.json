@@ -147,7 +147,9 @@
     "deleteAccountConfirmTitle": "アカウント削除",
     "deleteAccountConfirmMessage": "本当に退会しますか？すべてのデータが完全に削除され、元に戻すことはできません。",
     "deleteAccountConfirmButton": "削除する",
-    "deleteAccountErrorMessage": "アカウントの削除に失敗しました。"
+    "deleteAccountErrorMessage": "アカウントの削除に失敗しました。",
+    "chatMenuTitle": "とのトーク",
+    "clearChatHistory": "トーク履歴を削除"
   },
 "en": {
     "nameLabel": "Display Name",
@@ -297,7 +299,9 @@
     "deleteAccountConfirmTitle": "Delete Account",
     "deleteAccountConfirmMessage": "Are you sure you want to delete your account? All data will be permanently removed and cannot be undone.",
     "deleteAccountConfirmButton": "Delete",
-    "deleteAccountErrorMessage": "Failed to delete account."
+    "deleteAccountErrorMessage": "Failed to delete account.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Clear Chat History"
   },
 "ru": {
     "nameLabel": "Отображаемое имя",
@@ -447,7 +451,9 @@
     "deleteAccountConfirmTitle": "Удаление аккаунта",
     "deleteAccountConfirmMessage": "Вы уверены, что хотите удалить свой аккаунт? Все данные будут безвозвратно удалены.",
     "deleteAccountConfirmButton": "Удалить",
-    "deleteAccountErrorMessage": "Не удалось удалить аккаунт."
+    "deleteAccountErrorMessage": "Не удалось удалить аккаунт.",
+    "chatMenuTitle": "- Чат",
+    "clearChatHistory": "Очистить историю чата"
   },
 "es": {
     "nameLabel": "Nombre para mostrar",
@@ -597,7 +603,9 @@
     "deleteAccountConfirmTitle": "Eliminar cuenta",
     "deleteAccountConfirmMessage": "¿Estás seguro de que deseas eliminar tu cuenta? Todos los datos se borrarán permanentemente.",
     "deleteAccountConfirmButton": "Eliminar",
-    "deleteAccountErrorMessage": "Fallo al eliminar la cuenta."
+    "deleteAccountErrorMessage": "Fallo al eliminar la cuenta.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Borrar historial de chat"
   },
 "de": {
     "nameLabel": "Anzeigename",
@@ -747,7 +755,9 @@
     "deleteAccountConfirmTitle": "Konto löschen",
     "deleteAccountConfirmMessage": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Alle Daten werden dauerhaft entfernt.",
     "deleteAccountConfirmButton": "Löschen",
-    "deleteAccountErrorMessage": "Konto konnte nicht gelöscht werden."
+    "deleteAccountErrorMessage": "Konto konnte nicht gelöscht werden.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Chatverlauf löschen"
   },
 "hi": {
     "nameLabel": "प्रदर्शन नाम",
@@ -897,7 +907,9 @@
     "deleteAccountConfirmTitle": "खाता हटाएं",
     "deleteAccountConfirmMessage": "क्या आप वाकई अपना खाता हटाना चाहते हैं? सभी डेटा स्थायी रूप से हटा दिया जाएगा।",
     "deleteAccountConfirmButton": "हटाएं",
-    "deleteAccountErrorMessage": "खाता हटाने में विफल।"
+    "deleteAccountErrorMessage": "खाता हटाने में विफल।",
+    "chatMenuTitle": " के साथ चैट",
+    "clearChatHistory": "चैट इतिहास मिटाएं"
   },
 "zh": {
     "nameLabel": "显示名称",
@@ -1047,7 +1059,9 @@
     "deleteAccountConfirmTitle": "注销账号",
     "deleteAccountConfirmMessage": "您确定要注销账号吗？所有数据将被永久删除且无法恢复。",
     "deleteAccountConfirmButton": "注销",
-    "deleteAccountErrorMessage": "注销账号失败。"
+    "deleteAccountErrorMessage": "注销账号失败。",
+    "chatMenuTitle": " 的聊天",
+    "clearChatHistory": "清除聊天记录"
   },
 "ko": {
     "nameLabel": "표시 이름",
@@ -1197,7 +1211,9 @@
     "deleteAccountConfirmTitle": "계정 삭제",
     "deleteAccountConfirmMessage": "정말로 계정을 삭제하시겠습니까? 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.",
     "deleteAccountConfirmButton": "삭제",
-    "deleteAccountErrorMessage": "계정 삭제에 실패했습니다."
+    "deleteAccountErrorMessage": "계정 삭제에 실패했습니다.",
+    "chatMenuTitle": "님과의 대화",
+    "clearChatHistory": "채팅 내역 삭제"
   },
 "th": {
     "nameLabel": "ชื่อที่แสดง",
@@ -1347,7 +1363,9 @@
     "deleteAccountConfirmTitle": "ลบบัญชี",
     "deleteAccountConfirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ? ข้อมูลทั้งหมดจะถูกลบอย่างถาวร",
     "deleteAccountConfirmButton": "ลบ",
-    "deleteAccountErrorMessage": "ลบบัญชีไม่สำเร็จ"
+    "deleteAccountErrorMessage": "ลบบัญชีไม่สำเร็จ",
+    "chatMenuTitle": " - แชท",
+    "clearChatHistory": "ล้างประวัติการแชท"
   },
 "vi": {
     "nameLabel": "Tên hiển thị",
@@ -1497,7 +1515,9 @@
     "deleteAccountConfirmTitle": "Xóa tài khoản",
     "deleteAccountConfirmMessage": "Bạn có chắc chắn muốn xóa tài khoản của mình không? Tất cả dữ liệu sẽ bị xóa vĩnh viễn.",
     "deleteAccountConfirmButton": "Xóa",
-    "deleteAccountErrorMessage": "Xóa tài khoản thất bại."
+    "deleteAccountErrorMessage": "Xóa tài khoản thất bại.",
+    "chatMenuTitle": " - Trò chuyện",
+    "clearChatHistory": "Xóa lịch sử trò chuyện"
   },
 "fr": {
     "nameLabel": "Nom d'affichage",
@@ -1647,7 +1667,9 @@
     "deleteAccountConfirmTitle": "Supprimer le compte",
     "deleteAccountConfirmMessage": "Êtes-vous sûr de vouloir supprimer votre compte ? Toutes les données seront définitivement effacées.",
     "deleteAccountConfirmButton": "Supprimer",
-    "deleteAccountErrorMessage": "Échec de la suppression du compte."
+    "deleteAccountErrorMessage": "Échec de la suppression du compte.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Effacer l'historique du chat"
   },
 "pt": {
     "nameLabel": "Nome de Exibição",
@@ -1797,7 +1819,9 @@
     "deleteAccountConfirmTitle": "Excluir conta",
     "deleteAccountConfirmMessage": "Tem certeza de que deseja excluir sua conta? Todos os dados serão removidos permanentemente.",
     "deleteAccountConfirmButton": "Excluir",
-    "deleteAccountErrorMessage": "Falha ao excluir a conta."
+    "deleteAccountErrorMessage": "Falha ao excluir a conta.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Limpar histórico de chat"
   },
 "it": {
     "nameLabel": "Nome visualizzato",
@@ -1947,7 +1971,9 @@
     "deleteAccountConfirmTitle": "Elimina account",
     "deleteAccountConfirmMessage": "Sei sicuro di voler eliminare il tuo account? Tutti i dati verranno rimossi definitivamente.",
     "deleteAccountConfirmButton": "Elimina",
-    "deleteAccountErrorMessage": "Impossibile eliminare l'account."
+    "deleteAccountErrorMessage": "Impossibile eliminare l'account.",
+    "chatMenuTitle": "- Chat",
+    "clearChatHistory": "Cancella cronologia chat"
   },
 "id": {
     "nameLabel": "Nama Tampilan",
@@ -2097,7 +2123,9 @@
     "deleteAccountConfirmTitle": "Hapus Akun",
     "deleteAccountConfirmMessage": "Apakah Anda yakin ingin menghapus akun Anda? Semua data akan dihapus secara permanen.",
     "deleteAccountConfirmButton": "Hapus",
-    "deleteAccountErrorMessage": "Gagal menghapus akun."
+    "deleteAccountErrorMessage": "Gagal menghapus akun.",
+    "chatMenuTitle": "- Obrolan",
+    "clearChatHistory": "Hapus riwayat obrolan"
   },
 "ar": {
     "nameLabel": "اسم العرض",
@@ -2247,7 +2275,9 @@
     "deleteAccountConfirmTitle": "حذف الحساب",
     "deleteAccountConfirmMessage": "هل أنت متأكد أنك تريد حذف حسابك؟ سيتم إزالة جميع البيانات بشكل دائم.",
     "deleteAccountConfirmButton": "حذف",
-    "deleteAccountErrorMessage": "فشل حذف الحساب."
+    "deleteAccountErrorMessage": "فشل حذف الحساب.",
+    "chatMenuTitle": "- دردشة",
+    "clearChatHistory": "مسح سجل الدردشة"
   },
 "fa": {
     "nameLabel": "نام نمایشی",
@@ -2397,7 +2427,9 @@
     "deleteAccountConfirmTitle": "حذف حساب کاربری",
     "deleteAccountConfirmMessage": "آیا مطمئن هستید که می‌خواهید حساب خود را حذف کنید؟ تمام داده‌ها برای همیشه پاک خواهند شد.",
     "deleteAccountConfirmButton": "حذف",
-    "deleteAccountErrorMessage": "حذف حساب کاربری ناموفق بود。"
+    "deleteAccountErrorMessage": "حذف حساب کاربری ناموفق بود。",
+    "chatMenuTitle": "- چت",
+    "clearChatHistory": "پاک کردن تاریخچه چت"
   },
 "tr": {
     "nameLabel": "Görünen Ad",
@@ -2545,6 +2577,8 @@
     "deleteAccountConfirmTitle": "Hesabı Sil",
     "deleteAccountConfirmMessage": "Hesabınızı silmek istediğinize emin misiniz? Tüm veriler kalıcı olarak silinecektir.",
     "deleteAccountConfirmButton": "Sil",
-    "deleteAccountErrorMessage": "Hesap silinemedi."
+    "deleteAccountErrorMessage": "Hesap silinemedi.",
+    "chatMenuTitle": "- Sohbet",
+    "clearChatHistory": "Sohbet geçmişini temizle"
   }
 }
