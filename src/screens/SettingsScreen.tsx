@@ -16,7 +16,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { apiClient } from '../utils/api';
 import { Ionicons } from '@expo/vector-icons';
 import { GlobalStyles } from '../styles/GlobalStyles';
-import AdBanner from '../components/AdBanner'; // 🌟 インポート
+import AdBanner from '../components/AdBanner';
 
 export default function SettingsScreen({ navigation }: any) {
   const { theme, setTheme, themeType } = useTheme();
@@ -216,7 +216,6 @@ export default function SettingsScreen({ navigation }: any) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* 🌟 ScrollView の flex を 1 にして、バナーと領域を分けます */}
       <ScrollView contentContainerStyle={styles.scrollContainer} style={{ flex: 1 }}>
         <Text style={[styles.title, { color: colors.text }]}>{t('settingsTitle')}</Text>
         <TouchableOpacity onPress={pickImage} disabled={uploading} style={styles.avatarContainer}>
@@ -236,14 +235,22 @@ export default function SettingsScreen({ navigation }: any) {
         </View>
         <View style={styles.themeSection}>
           <Text style={[styles.sectionTitle, { color: colors.secondaryText }]}>{t('themeChangeTitle')}</Text>
-          <View style={styles.themeSelectorRow}>{renderThemeSelector('light', t('themeLight'))}{renderThemeSelector('dark', t('themeDark'))}{renderThemeSelector('purple_ramya', t('themeRamya'))}</View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {/* 🌟 べた書きを廃止し、翻訳ファイル（t）から読み込むように変更 */}
+            <View style={{ width: '48%', marginBottom: 10 }}>{renderThemeSelector('light', t('themeLight'))}</View>
+            <View style={{ width: '48%', marginBottom: 10 }}>{renderThemeSelector('dark', t('themeDark'))}</View>
+            <View style={{ width: '48%' }}>{renderThemeSelector('purple_ramya', t('themeRamya'))}</View>
+            <View style={{ width: '48%' }}>{renderThemeSelector('yellow', t('themeYellow'))}</View>
+          </View>
         </View>
-        <TouchableOpacity style={[styles.outlineButton, { borderColor: colors.border, backgroundColor: colors.card, marginBottom: 20 }]} onPress={() => navigation.navigate('LanguageSelect')}>
+        
+        <TouchableOpacity style={[styles.outlineButton, { borderColor: colors.border, backgroundColor: colors.card, marginBottom: 20 }]} onPress={() => navigation.navigate('LanguageSelect', { user: userData })}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}><Ionicons name="globe-outline" size={20} color={colors.text} style={{ marginRight: 8 }} /><Text style={[styles.outlineButtonText, { color: colors.text }]}>{t('languageChangeTitle')}</Text></View>
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </View>
         </TouchableOpacity>
+
         <View style={styles.actionsContainer}>
           <TouchableOpacity style={[styles.outlineButton, { borderColor: colors.primary, backgroundColor: colors.card }]} onPress={handleResetPassword}><Text style={[styles.outlineButtonText, { color: colors.primary }]}>{t('resetPasswordButton')}</Text></TouchableOpacity>
           {isEditingEmail ? (
@@ -263,7 +270,6 @@ export default function SettingsScreen({ navigation }: any) {
         </View>
       </ScrollView>
 
-      {/* 🌟 ScrollView の外側に配置することで、画面下部に固定 */}
       <AdBanner />
 
       {Platform.OS === 'web' && selectedWebImage && (
@@ -299,8 +305,7 @@ const styles = StyleSheet.create({
   profileId: { fontSize: 14, marginTop: 5 },
   themeSection: { width: '100%', marginBottom: 30 },
   sectionTitle: { fontSize: 14, fontWeight: 'bold', marginBottom: 10, marginLeft: 5 },
-  themeSelectorRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  themeOption: { flex: 1, marginHorizontal: 5, paddingVertical: 12, borderRadius: 10, borderWidth: 1, alignItems: 'center' },
+  themeOption: { flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1, alignItems: 'center' }, 
   actionsContainer: { width: '100%' },
   outlineButton: { borderWidth: 1, paddingVertical: 12, paddingHorizontal: 40, borderRadius: 25, width: '100%', alignItems: 'center', marginBottom: 15 },
   outlineButtonText: { fontSize: 16, fontWeight: 'bold' },

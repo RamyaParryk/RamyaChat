@@ -147,4 +147,29 @@ router.get('/search-messages', async (req, res) => {
     res.status(500).json({ error: 'DB error' });
   }
 });
+
+/* ================================
+   📞 通話履歴の取得 API
+================================ */
+router.get('/call-history/:username', async (req, res) => {
+  const username = req.params.username;
+  try {
+    const result = await pool.query(`
+      SELECT c.*,
+        u_caller.display_name AS caller_name, u_caller.avatar_url AS caller_avatar,
+        u_receiver.display_name AS receiver_name, u_receiver.avatar_url AS receiver_avatar
+      FROM calls c
+      JOIN users u_caller ON c.caller_id = u_caller.username
+      JOIN users u_receiver ON c.receiver_id = u_receiver.username
+      WHERE c.caller_id = $1 OR c.receiver_id = $1
+      ORDER BY c.created_at DESC LIMIT 50
+    `, [username]);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error('❌ Call history fetch error', err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
 module.exports = router;

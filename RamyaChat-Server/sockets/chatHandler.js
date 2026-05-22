@@ -53,12 +53,17 @@ async function saveMessageToDB(msg, roomId) {
   }
 }
 
-let onlineUsers = new Set();
+const activeUsers = new Map();
+// 🌟 メモリリークを防ぐため、オブジェクト構造にしてタイマーも一緒に管理
+const activeRingingCalls = new Map(); 
 
 module.exports = function(io) {
   io.on('connection', (socket) => {
     console.log(`🔌 User connected ${socket.id}`);
 
+    // ==========================================
+    // チャット・オンライン管理ロジック
+    // ==========================================
     socket.on('user_online', async (data) => {
       const username = typeof data === 'string' ? data : (data.username || data._id);
       const displayName = typeof data === 'object' ? (data.name || data.displayName) : username;
@@ -67,7 +72,7 @@ module.exports = function(io) {
       if (!username) return;
 
       socket.userId = username;
-      onlineUsers.add(username);
+      activeUsers.set(socket.id, username);
       
       try {
         await pool.query(`
@@ -76,13 +81,11 @@ module.exports = function(io) {
           ON CONFLICT (username) 
           DO UPDATE SET is_active = true, deleted_at = NULL
         `, [username, displayName, avatarUrl]);
-        console.log(`✅ User materialized on login: ${username}`);
-      } catch (err) {
-        console.error('❌ User sync failed:', err);
-      }
+      } catch (err) {}
 
       socket.join(username);
-      io.emit('update_online_users', Array.from(onlineUsers));
+      const onlineIds = [...new Set(activeUsers.values())];
+      io.emit('update_online_users', onlineIds);
     });
 
     socket.on('typing_start', ({ roomId, userId }) => socket.to(roomId).emit('display_typing', { userId, isTyping: true }));
@@ -91,31 +94,19 @@ module.exports = function(io) {
     socket.on('join_room', async ({ roomId, userId, targetMessageId }) => {
       socket.join(roomId);
       try {
-        await pool.query(`
-          UPDATE messages SET is_read = TRUE
-          WHERE room_id = $1 AND sender_id != (SELECT user_id FROM users WHERE username = $2) AND is_read = FALSE
-        `, [roomId, userId]);
+        await pool.query(`UPDATE messages SET is_read = TRUE WHERE room_id = $1 AND sender_id != (SELECT user_id FROM users WHERE username = $2) AND is_read = FALSE`, [roomId, userId]);
         
-        // 🌟 相手の個人Socket宛に既読通知を送る
         const partnerId = roomId.startsWith(userId + '_') ? roomId.slice(userId.length + 1) : roomId.slice(0, roomId.length - userId.length - 1);
         if (partnerId) io.to(partnerId).emit('messages_read', { roomId });
         socket.to(roomId).emit('messages_read', { roomId });
 
-        // 🌟 自分が最後に履歴クリアした時間を取得
-        const clearedAtRes = await pool.query(`
-          SELECT CASE 
-            WHEN left(room_id, length($1) + 1) = $1 || '_' THEN user1_cleared_at
-            ELSE user2_cleared_at
-          END as cleared_at
-          FROM rooms WHERE room_id = $2
-        `, [userId, roomId]);
+        const clearedAtRes = await pool.query(`SELECT CASE WHEN left(room_id, length($1) + 1) = $1 || '_' THEN user1_cleared_at ELSE user2_cleared_at END as cleared_at FROM rooms WHERE room_id = $2`, [userId, roomId]);
         const clearedAt = clearedAtRes.rows[0]?.cleared_at || '1970-01-01T00:00:00.000Z';
         
         let query = '';
         let params = [roomId, clearedAt];
 
         if (targetMessageId) {
-          // 🌟 検索から飛んだ場合はクリア日時は無視する
           query = `
             WITH target_msg AS (SELECT timestamp FROM messages WHERE message_id = $3),
             around_messages AS (
@@ -127,9 +118,8 @@ module.exports = function(io) {
             )
             SELECT * FROM around_messages ORDER BY "createdAt" DESC
           `;
-          params.push(targetMessageId); // $3
+          params.push(targetMessageId); 
         } else {
-          // 🌟 通常のチャット入室時は、クリア日時より新しいものだけを取得！
           query = `
             SELECT m.message_id AS "_id", m.text, m.image_url AS "image", m.file_url AS "file", m.file_name AS "fileName", m.audio AS "audio", m.timestamp AS "createdAt", m.is_read AS "isRead", u.username AS "userUsername", u.display_name AS "userName", u.avatar_url AS "userAvatar"
             FROM messages m JOIN users u ON m.sender_id = u.user_id 
@@ -144,22 +134,13 @@ module.exports = function(io) {
           user: { _id: row.userUsername, name: row.userName, username: row.userUsername, avatar: row.userAvatar }
         }));
         socket.emit('load_history', history);
-      } catch (err) {
-        console.error('❌ History load error', err);
-      }
+      } catch (err) { console.error('❌ History load error', err); }
     });
 
     socket.on('load_more_history', async ({ roomId, cursor }) => {
       try {
         const userId = socket.userId;
-        // 🌟 ロード時もクリア日時をチェック
-        const clearedAtRes = await pool.query(`
-          SELECT CASE 
-            WHEN left(room_id, length($1) + 1) = $1 || '_' THEN user1_cleared_at
-            ELSE user2_cleared_at
-          END as cleared_at
-          FROM rooms WHERE room_id = $2
-        `, [userId, roomId]);
+        const clearedAtRes = await pool.query(`SELECT CASE WHEN left(room_id, length($1) + 1) = $1 || '_' THEN user1_cleared_at ELSE user2_cleared_at END as cleared_at FROM rooms WHERE room_id = $2`, [userId, roomId]);
         const clearedAt = clearedAtRes.rows[0]?.cleared_at || '1970-01-01T00:00:00.000Z';
 
         const query = `
@@ -176,9 +157,7 @@ module.exports = function(io) {
 
         if (history.length === 0) return;
         socket.emit('receive_more_history', history);
-      } catch (err) {
-        console.error('❌ More history load error', err);
-      }
+      } catch (err) {}
     });
 
     socket.on('send_message', async (data) => {
@@ -201,14 +180,14 @@ module.exports = function(io) {
           });
 
           if (isBlocked || !isFriend) {
-            console.log(`💬 [GUARD] 🚫 ${senderUsername} から ${receiverUsername} への通信를 బ్లాックホールに吸い込みました`);
             data.createdAt = new Date().toISOString();
             socket.emit('receive_message', data);
             return; 
           }
         }
-      } catch (err) {
-        console.error("❌ 通信ガード検知エラー:", err);
+      } catch (err) { 
+        // 🌟 今後バグが見つけやすいようにエラーログを出力
+        console.error('❌ send_message relation check error:', err);
         return; 
       }
 
@@ -226,19 +205,21 @@ module.exports = function(io) {
         const senderUsernameForPush = data.user.username || data.user._id; 
 
         if (receiverUsername) {
-          const receiverRes = await pool.query('SELECT push_token FROM users WHERE username = $1 AND is_active = true', [receiverUsername]);
+          const receiverRes = await pool.query('SELECT push_token, language FROM users WHERE username = $1 AND is_active = true', [receiverUsername]);
           if (receiverRes.rows.length > 0) {
             const pushToken = receiverRes.rows[0].push_token;
+            const langCode = receiverRes.rows[0].language;
+            
             if (pushToken && pushToken.startsWith('ExponentPushToken')) {
               const senderRes = await pool.query('SELECT display_name, avatar_url FROM users WHERE username = $1', [senderUsernameForPush]);
               const senderDisplayName = senderRes.rows[0]?.display_name || data.user.name || senderUsernameForPush;
               const senderAvatar = senderRes.rows[0]?.avatar_url || data.user.avatar || `${baseUrl}/avatars/default.png`;
               
-              const lang = data.lang || 'ja'; 
+              const lang = langCode || 'ja'; 
               let msgBody = data.text;
               if (data.image) msgBody = getMsg(lang, 'imageSentMessage');
               if (data.file) msgBody = getMsg(lang, 'fileSentMessage');
-              if (data.audio) msgBody = '🎤 音声を送信しました';
+              if (data.audio) msgBody = getMsg(lang, 'audioSentMessage');
 
               const pushData = { roomId: roomId, sender: { username: senderUsernameForPush, displayName: senderDisplayName, avatar: senderAvatar } };
               const pushTitle = `${senderDisplayName}${getMsg(lang, 'newMsg')}`;
@@ -247,25 +228,176 @@ module.exports = function(io) {
           }
         }
       } catch (err) {
-        console.error('❌ Push token fetch error', err);
+        console.error('❌ push notification processing error:', err);
       }
     });
 
     socket.on('mark_as_read', async ({ roomId, userId }) => {
       try {
         await pool.query(`UPDATE messages SET is_read = TRUE WHERE room_id = $1 AND sender_id != (SELECT user_id FROM users WHERE username = $2) AND is_read = FALSE`, [roomId, userId]);
-        
         const partnerId = roomId.startsWith(userId + '_') ? roomId.slice(userId.length + 1) : roomId.slice(0, roomId.length - userId.length - 1);
         if (partnerId) io.to(partnerId).emit('messages_read', { roomId });
         socket.to(roomId).emit('messages_read', { roomId });
-      } catch (err) { console.error('❌ Read update error', err); }
+      } catch (err) {}
     });
 
-    socket.on('disconnect', () => {
-      if (socket.userId) {
-        onlineUsers.delete(socket.userId);
-        io.emit('update_online_users', Array.from(onlineUsers));
+    // ==========================================
+    // 📞 WebRTC 通話機能の中継用イベント
+    // ==========================================
+    socket.on('initiate_call', async (data) => {
+      console.log(`📞 Call initiated in room ${data.roomId}`);
+      
+      const callerUsername = socket.userId;
+      if (!callerUsername) return;
+      
+      const receiverUsername = data.roomId.startsWith(callerUsername + '_') 
+        ? data.roomId.slice(callerUsername.length + 1) 
+        : data.roomId.slice(0, data.roomId.length - callerUsername.length - 1);
+
+      if (!receiverUsername) return;
+
+      try {
+        // 🛡️ 1. 相互のブロック・友達関係を厳格チェック
+        const relationCheck = await pool.query(`
+          SELECT f.status FROM friendships f
+          WHERE (f.user_id = (SELECT user_id FROM users WHERE username = $1 AND is_active = true) AND f.friend_id = (SELECT user_id FROM users WHERE username = $2 AND is_active = true))
+             OR (f.user_id = (SELECT user_id FROM users WHERE username = $2 AND is_active = true) AND f.friend_id = (SELECT user_id FROM users WHERE username = $1 AND is_active = true))
+        `, [receiverUsername, callerUsername]);
+
+        let isBlocked = false;
+        let isFriend = false;
+        relationCheck.rows.forEach(row => {
+          if (row.status === 'blocked') isBlocked = true;
+          if (row.status === 'accepted') isFriend = true;
+        });
+
+        // ブロックされている、または友達でないなら強制終了
+        if (isBlocked || !isFriend) {
+          console.log(`🛡️ Call blocked from ${callerUsername} to ${receiverUsername}`);
+          socket.emit('call_rejected');
+          return;
+        }
+
+        // 🌟 2. メモリリーク対策付きでコール情報を登録
+        if (activeRingingCalls.has(data.roomId)) {
+          clearTimeout(activeRingingCalls.get(data.roomId).timeoutId);
+        }
+
+        const timeoutId = setTimeout(() => {
+          if (activeRingingCalls.has(data.roomId)) {
+            console.log(`⏰ Call timeout for room ${data.roomId} (Auto cleaned)`);
+            activeRingingCalls.delete(data.roomId);
+          }
+        }, 60000);
+
+        activeRingingCalls.set(data.roomId, {
+          startTime: Date.now(),
+          timeoutId: timeoutId
+        });
+
+        // 相手にシグナリングパケットを送信
+        socket.to(data.roomId).emit('incoming_call', {
+          callerName: data.callerName,
+          isVideo: data.isVideo,
+          fromSocketId: socket.id
+        });
+
+        // 3. プッシュ通知を送信
+        const receiverRes = await pool.query('SELECT push_token, language FROM users WHERE username = $1 AND is_active = true', [receiverUsername]);
+        if (receiverRes.rows.length > 0) {
+          const pushToken = receiverRes.rows[0].push_token;
+          const langCode = receiverRes.rows[0].language;
+          
+          if (pushToken && pushToken.startsWith('ExponentPushToken')) {
+            const senderRes = await pool.query('SELECT display_name, avatar_url FROM users WHERE username = $1', [callerUsername]);
+            const senderDisplayName = senderRes.rows[0]?.display_name || data.callerName;
+            const senderAvatar = senderRes.rows[0]?.avatar_url || `${baseUrl}/avatars/default.png`;
+            
+            const lang = langCode || 'ja'; 
+            
+            const pushTitle = `${senderDisplayName} ${getMsg(lang, 'callPushTitle') || 'からの着信'}`;
+            const pushBody = data.isVideo 
+              ? (getMsg(lang, 'videoCallPushBody') || '📹 ビデオ通話の着信です') 
+              : (getMsg(lang, 'audioCallPushBody') || '📞 音声通話の着信です');
+
+            const pushData = { 
+              roomId: data.roomId, 
+              sender: { username: callerUsername, displayName: senderDisplayName, avatar: senderAvatar },
+              isCall: true,
+              isVideo: data.isVideo
+            };
+            
+            await sendPushNotification(pushToken, pushTitle, pushBody, pushData);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Call initiation / safety check error:', err);
+        socket.emit('call_rejected');
       }
+    });
+
+    socket.on('accept_call', (data) => {
+      const callInfo = activeRingingCalls.get(data.roomId);
+      if (callInfo) {
+        clearTimeout(callInfo.timeoutId);
+        activeRingingCalls.delete(data.roomId);
+      }
+      socket.to(data.roomId).emit('call_accepted', { fromSocketId: socket.id });
+    });
+
+    socket.on('reject_call', (data) => {
+      const callInfo = activeRingingCalls.get(data.roomId);
+      if (callInfo) {
+        clearTimeout(callInfo.timeoutId);
+        activeRingingCalls.delete(data.roomId);
+      }
+      socket.to(data.roomId).emit('call_rejected');
+    });
+
+    socket.on('check_call_status', ({ roomId }) => {
+      const callInfo = activeRingingCalls.get(roomId);
+      const isActive = callInfo && (Date.now() - callInfo.startTime < 60000);
+      socket.emit('call_status_result', { isActive: !!isActive });
+    });
+
+    socket.on('webrtc_offer', (data) => {
+      socket.to(data.roomId).emit('webrtc_offer', { offer: data.offer });
+    });
+
+    socket.on('webrtc_answer', (data) => {
+      socket.to(data.roomId).emit('webrtc_answer', { answer: data.answer });
+    });
+
+    socket.on('webrtc_ice_candidate', (data) => {
+      socket.to(data.roomId).emit('webrtc_ice_candidate', { candidate: data.candidate });
+    });
+
+    // ==========================================
+    // 📞 通話履歴の保存
+    // ==========================================
+    socket.on('save_call_history', async (data) => {
+      try {
+        const { roomId, callerId, receiverId, callType, status, duration } = data;
+        await pool.query(`
+          INSERT INTO calls (room_id, caller_id, receiver_id, call_type, status, duration) 
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, [roomId, callerId, receiverId, callType, status, duration || 0]);
+        
+        io.to(receiverId).emit('call_history_updated');
+        io.to(callerId).emit('call_history_updated');
+        console.log(`🐘 Call history saved: room:${roomId}, status:${status}`);
+      } catch (err) {
+        console.error('❌ Failed to save call history into database:', err);
+      }
+    });
+
+    // ==========================================
+    // 切断ロジック
+    // ==========================================
+    socket.on('disconnect', () => {
+      activeUsers.delete(socket.id);
+      const onlineIds = [...new Set(activeUsers.values())];
+      io.emit('update_online_users', onlineIds);
     });
   });
 };

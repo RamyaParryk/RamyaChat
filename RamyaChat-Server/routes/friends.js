@@ -218,4 +218,21 @@ router.post('/delete-account', async (req, res) => {
   }
 });
 
+// ================================
+// 10. 🌍 言語設定の保存 API
+// ================================
+router.post('/update-language', async (req, res) => {
+  const { username, language } = req.body;
+  if (!username || !language) return res.status(400).json({ error: 'Missing parameters' });
+
+  try {
+    await pool.query('UPDATE users SET language = $1 WHERE username = $2', [language, username]);
+    console.log(`🌍 Language updated for ${username}: ${language}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Language update error', err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
 module.exports = router;

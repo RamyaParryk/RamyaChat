@@ -4,12 +4,12 @@ import { DefaultTheme, DarkTheme } from '@react-navigation/native';
 
 // 全テーマ共通のカラー定義（ブランドカラーなど）
 const palette = {
-  purplePrimary: '#A020F0', // Ramyaちゃんの髪色から抽出したパープル
+  purplePrimary: '#A020F0', // Ramyaの髪色
   purpleLight: '#D8BFD8',
   purpleDark: '#4B0082',
   skyBlue: '#007AFF', // 標準のiOS風ブルー
   dangerRed: '#FF3B30',
-  mintGreen: '#98FB98', // 女の子の制服の襟元から抽出
+  mintGreen: '#98FB98', // 服の襟元から抽出
   darkBg: '#121212', // ダークモード用の少し柔らかい黒
 };
 
@@ -27,23 +27,23 @@ export interface AppThemeColors {
   chatBubblePartner: string; // 相手の吹き出し色
 }
 
-// 👗 テーマの種類を定義
-export type ThemeType = 'light' | 'dark' | 'purple_ramya';
+// 👗 テーマの種類を定義（yellowを追加！）
+export type ThemeType = 'light' | 'dark' | 'purple_ramya' | 'yellow';
 
 // React Navigationの標準テーマを継承してカスタムテーマを作成
 export const Themes: Record<ThemeType, typeof DefaultTheme & { colors: AppThemeColors }> = {
-  // 1️⃣ 標準：ライトテーマ（スクリーンショットに近い設定）
+  // 1️⃣ 標準：ライトテーマ
   light: {
     ...DefaultTheme,
     dark: false,
     colors: {
       ...DefaultTheme.colors,
-      background: '#F2F2F7', // image_6.png の少しグレーがかった白
-      card: '#ffffff', // image_7.png のトークリストの白
-      text: '#000000', // 標準の黒テキスト
-      primary: palette.skyBlue, // 標準の青ボタン
+      background: '#F2F2F7', 
+      card: '#ffffff', 
+      text: '#000000', 
+      primary: palette.skyBlue, 
       primaryText: '#ffffff',
-      border: '#C7C7CC', // 薄いグレーの線
+      border: '#C7C7CC', 
       notification: palette.dangerRed,
       secondaryText: '#8E8E93',
       chatBubbleSelf: palette.skyBlue,
@@ -70,22 +70,41 @@ export const Themes: Record<ThemeType, typeof DefaultTheme & { colors: AppThemeC
     },
   },
 
-  // 3️⃣ スペシャルスキン：「Ramya Purple」（キャラクターモチーフ）
+  // 3️⃣ スペシャルスキン
   purple_ramya: {
     ...DarkTheme,
     dark: true,
     colors: {
       ...DarkTheme.colors,
-      background: '#000000', // Ramyaちゃんが際立つ黒（image_5.pngの背景）
-      card: '#121212', // 深い紫を帯びた黒（カード用）
-      text: '#E6E6FA', // ほんのり紫を帯びた白
-      primary: palette.purplePrimary, // Ramyaパープル
+      background: '#1A0B2E', // ダークよりさらに深みのある紫ベース
+      card: '#2D1B4E', 
+      text: '#FFFFFF', 
+      primary: '#B388FF', 
       primaryText: '#ffffff',
-      border: palette.purpleDark, // 深い紫の線
+      border: '#4A327C', 
       notification: palette.dangerRed,
-      secondaryText: '#A9A9A9',
-      chatBubbleSelf: palette.purplePrimary,
-      chatBubblePartner: '#3A3A3C',
+      secondaryText: '#D1C4E9',
+      chatBubbleSelf: '#6200EA',
+      chatBubblePartner: '#311B5E',
     },
   },
+
+  // 4️⃣ スペシャルスキン：「Yellow」
+  yellow: {
+    ...DefaultTheme,
+    dark: false,
+    colors: {
+      ...DefaultTheme.colors,
+      background: '#FFFDE7', // ほんのり黄色い背景
+      card: '#FFFFFF', 
+      text: '#333333', 
+      primary: '#F57F17', // オレンジイエローのボタン
+      primaryText: '#000000', // ボタン上の文字は読みやすく黒に
+      border: '#FFF59D', 
+      notification: palette.dangerRed,
+      secondaryText: '#757575',
+      chatBubbleSelf: '#FBC02D',
+      chatBubblePartner: '#FFF9C4',
+    }
+  }
 };

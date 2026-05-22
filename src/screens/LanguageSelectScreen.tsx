@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
-import { t } from '../utils/translator';
+import { apiClient } from '../utils/api';
 
 const LANGUAGES = [
   { label: '日本語', code: 'ja' },
@@ -24,22 +24,44 @@ const LANGUAGES = [
   { label: 'Türkçe', code: 'tr' },
   { label: 'العربية', code: 'ar' },
   { label: 'فارسی', code: 'fa' },
+  { label: 'Kiswahili', code: 'sw' }
 ];
 
-// @ts-ignore
-export default function LanguageSelectScreen({ navigation }) {
+export default function LanguageSelectScreen({ navigation, route }: any) {
   const { theme } = useTheme();
   const { colors } = theme;
   const { language, changeLanguage } = useLanguage();
 
+  // 🌟 設定画面などから渡されたユーザー情報を受け取る
+  const user = route.params?.user;
+
   const handleSelect = async (code: string) => {
+    // 1. スマホ内の言語設定を更新
     await changeLanguage(code);
-    navigation.goBack(); // 選んだら自動的に設定画面に戻る！
+
+    // 2. もしログイン中なら、サーバー（DB）にも言語を保存する
+    if (user && (user.username || user._id)) {
+      try {
+        await apiClient.post('/update-language', {
+          username: user.username || user._id,
+          language: code
+        });
+      } catch (error) {
+        console.error('サーバーへの言語保存に失敗しました:', error);
+      }
+    }
+
+    // 3. 少し待ってから前の画面に戻る（UX向上）
+    setTimeout(() => {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+    }, 200);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
-      <ScrollView>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={[styles.listContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {LANGUAGES.map((item, index) => {
             const isSelected = language === item.code;
@@ -76,6 +98,8 @@ export default function LanguageSelectScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scrollContainer: { paddingVertical: 20 },
   listContainer: {
     marginTop: 20,
     borderTopWidth: StyleSheet.hairlineWidth,

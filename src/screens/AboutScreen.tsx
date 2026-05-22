@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { t } from '../utils/translator';
 import packageJson from '../../package.json';
-import AdBanner from '../components/AdBanner'; // 🌟 インポート
+import AdBanner from '../components/AdBanner'; 
 
 export default function AboutScreen({ navigation }: any) {
   const { theme } = useTheme();
@@ -50,6 +50,7 @@ export default function AboutScreen({ navigation }: any) {
           {renderLinkItem("shield-checkmark-outline", "privacyPolicy", () => Linking.openURL('https://ramyachat-260313.web.app/privacy.html'))}
         </View>
 
+        {/* 1. 一般FAQセクション */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('helpAndFaq')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
           {renderFaqItem('faq1Q', 'faq1A')}
@@ -57,6 +58,14 @@ export default function AboutScreen({ navigation }: any) {
           {renderFaqItem('faq3Q', 'faq3A')}
         </View>
 
+        {/* 🌟 2. 通話に関するFAQセクション */}
+        <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('tabCallsFaq')}</Text>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
+          {renderFaqItem('faqCall1Q', 'faqCall1A')}
+          {renderFaqItem('faqCall2Q', 'faqCall2A')}
+        </View>
+
+        {/* 3. 容量・規約FAQセクション */}
         <Text style={[styles.sectionHeading, { color: colors.secondaryText }]}>{t('limitsAndPrivacy')}</Text>
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
           {renderFaqItem('faq4Q', 'faq4A')}
@@ -66,9 +75,7 @@ export default function AboutScreen({ navigation }: any) {
         <Text style={styles.copyright}>© 2026 RatoLab (TomatoJuice). All rights reserved.</Text>
       </ScrollView>
 
-      {/* 🌟 画面下部に広告を固定 */}
       <AdBanner />
-
     </View>
   );
 }

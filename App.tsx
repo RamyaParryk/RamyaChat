@@ -15,8 +15,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import FriendsScreen from './src/screens/FriendsScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import LanguageSelectScreen from './src/screens/LanguageSelectScreen';
-// 🌟 通報画面を追加インポート
 import ReportScreen from './src/screens/ReportScreen'; 
+import CallsScreen from './src/screens/CallsScreen';
 
 import { t } from './src/utils/translator'; 
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
@@ -27,13 +27,19 @@ const Tab = createBottomTabNavigator();
 
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: false,
-      shouldShowBanner: false,
-      shouldShowList: false,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
+    handleNotification: async (notification) => {
+      // 🌟 アプリ起動中の通知バナーを制御
+      // 通話の時はバナーを出さずに強制画面遷移させるため false にする
+      const data = notification.request.content.data;
+      const isCall = data && data.isCall;
+      return {
+        shouldShowAlert: !isCall,
+        shouldShowBanner: !isCall,
+        shouldShowList: true,
+        shouldPlaySound: !isCall,
+        shouldSetBadge: false,
+      };
+    },
   });
 }
 
@@ -53,7 +59,6 @@ function MainTabs({ route }: any) {
   const { theme } = useTheme();
   const { colors } = theme;
   
-  // 🌟 言語が変わった時にタブ名も再描画させるためにフックを呼び出す
   const { language } = useLanguage();
 
   useEffect(() => {
@@ -69,7 +74,9 @@ function MainTabs({ route }: any) {
             navigation.navigate('Chat', {
               user: user, 
               roomId: pushData.roomId,
-              chatPartner: pushData.sender
+              chatPartner: pushData.sender,
+              isIncomingCall: pushData.isCall, 
+              isVideoCall: pushData.isVideo    
             });
           }
         }
@@ -80,6 +87,7 @@ function MainTabs({ route }: any) {
 
     checkKilledStateNotification();
 
+    // アプリがバックグラウンドにある時に通知をタップした時の処理
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
       const pushData = response.notification.request.content.data;
       if (pushData && pushData.roomId && pushData.sender && user) {
@@ -87,13 +95,32 @@ function MainTabs({ route }: any) {
         navigation.navigate('Chat', {
           user: user, 
           roomId: pushData.roomId,
-          chatPartner: pushData.sender
+          chatPartner: pushData.sender,
+          isIncomingCall: pushData.isCall, 
+          isVideoCall: pushData.isVideo    
+        });
+      }
+    });
+
+    // 🌟 アプリを開いている時（フォアグラウンド）に通知を受信した時の処理
+    const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
+      const pushData = notification.request.content.data;
+      // 着信フラグ (isCall) があれば、問答無用でチャット画面に引きずり込む
+      if (pushData && pushData.isCall && pushData.roomId && pushData.sender && user) {
+        // @ts-ignore
+        navigation.navigate('Chat', {
+          user: user, 
+          roomId: pushData.roomId,
+          chatPartner: pushData.sender,
+          isIncomingCall: true, // 強制的に着信画面を出す
+          isVideoCall: pushData.isVideo
         });
       }
     });
 
     return () => {
       subscription.remove();
+      foregroundSubscription.remove(); // リスナーの解除
     };
   }, [user, navigation]); 
 
@@ -106,6 +133,8 @@ function MainTabs({ route }: any) {
             iconName = focused ? 'people' : 'people-outline';
           } else if (route.name === 'Home') {
             iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+          } else if (route.name === 'Calls') {
+            iconName = focused ? 'call' : 'call-outline';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'settings' : 'settings-outline';
           }
@@ -121,6 +150,7 @@ function MainTabs({ route }: any) {
     >
       <Tab.Screen name="Friends" component={FriendsScreen} initialParams={{ user }} options={{ title: t('tabFriends') }} />
       <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} options={{ title: t('tabTalk') }} />
+      <Tab.Screen name="Calls" component={CallsScreen} initialParams={{ user }} options={{ title: t('tabCalls') || '通話' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} initialParams={{ user }} options={{ title: t('tabSettings') }} />
     </Tab.Navigator>
   );
@@ -130,18 +160,15 @@ function AppInner() {
   const [appIsReady, setAppIsReady] = useState(false);
   const { theme } = useTheme();
   
-  // 🌟 言語が変わった時にヘッダー（戻るボタンなど）を再描画させるために呼び出す
   const { language } = useLanguage();
 
   useEffect(() => {
     async function prepare() {
       try {
-        console.log("🌟 裏側で準備開始...");
         await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (e) {
         console.warn(e);
       } finally {
-        console.log("🌟 準備完了！フラグを立てます。");
         setAppIsReady(true);
       }
     }
@@ -150,7 +177,6 @@ function AppInner() {
 
   useEffect(() => {
     if (appIsReady) {
-      console.log("🌟 UI描画許可確認！ネイティブスプラッシュを隠します！");
       SplashScreen.hideAsync();
     }
   }, [appIsReady]);
@@ -168,8 +194,6 @@ function AppInner() {
           <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'RamyaChat', headerBackTitle: t('backButton') }} />
           <Stack.Screen name="About" component={AboutScreen} options={{ title: t('aboutApp'), headerBackTitle: t('backButton') }} />
           <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} options={{ title: t('languageChangeTitle') || '言語の変更', headerBackTitle: t('backButton') }} />
-          
-          {/* 🌟 通報画面のルーティング */}
           <Stack.Screen 
             name="ReportScreen" 
             component={ReportScreen} 
@@ -184,7 +208,6 @@ function AppInner() {
   );
 }
 
-// 🌟 最上位コンポーネント：LanguageProviderで全体をさらに囲む！
 export default function App() {
   return (
     <LanguageProvider>
