@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
+const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.ratolab.uk';
 const translations = require('../utils/translations.json');
 
 function getMsg(lang, key) {
@@ -31,7 +31,7 @@ async function saveMessageToDB(msg, roomId) {
       VALUES ($1, $2, $3)
       ON CONFLICT (username)
       DO UPDATE SET display_name = EXCLUDED.display_name,
-        avatar_url = CASE WHEN users.avatar_url LIKE '%chat.tomato-juice.biz%' THEN users.avatar_url ELSE EXCLUDED.avatar_url END
+        avatar_url = CASE WHEN users.avatar_url LIKE '%chat.ratolab.uk%' THEN users.avatar_url ELSE EXCLUDED.avatar_url END
       RETURNING user_id
     `, [msg.user.username, msg.user.name, msg.user.avatar]);
     

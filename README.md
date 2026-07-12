@@ -35,4 +35,4 @@ It was developed with the goal of providing a seamless messaging experience.
 ## 📄 Documentation
 
 * [Privacy Policy](./PRIVACY_POLICY.md)
-* [License: MIT](./LICENSE)
+* [License: MIT](./LICENSE.md)

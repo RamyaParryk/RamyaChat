@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { io } from 'socket.io-client'; // 🌟 これを追加！
+import { io } from 'socket.io-client';
 
 import { 
   signInWithEmailAndPassword, 
@@ -82,7 +82,7 @@ export default function LoginScreen({ navigation }) {
           // 🌟 罠①対策：ログイン検知直後に一瞬だけサーバーに合図を送り、確実にDBへ実体化させる！
           // これで「トーク画面を踏むまで追加できない」ポンコツ仕様が消滅します
           try {
-            const socketUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
+            const socketUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.ratolab.uk';
             const tempSocket = io(socketUrl, { transports: ['websocket'] });
             
             console.log(`🚀 自動実体化リクエスト送信: ${userPayload.username}`);

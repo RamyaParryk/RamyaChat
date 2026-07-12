@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
-// 1. 🔍 ユーザー検索 (幽霊退治版)
+// 1. 🔍 ユーザー検索
 router.get('/search-users', async (req, res) => {
   const { q, currentUsername } = req.query;
   if (!q) return res.json([]);

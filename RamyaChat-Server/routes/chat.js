@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
-const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
+const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.ratolab.uk';
 
 /* ================================
    🌟 チャット履歴のクリア

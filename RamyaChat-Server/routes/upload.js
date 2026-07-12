@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const pool = require('../config/db');
 // 👇 もし環境変数が空っぽでも、右側のURLが必ず使われる
-const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.tomato-juice.biz';
+const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'https://chat.ratolab.uk';
 
 // 🌟 画像専用のフィルターを作成（アバターとチャット画像で共用）
 const imageFilter = (req, file, cb) => {

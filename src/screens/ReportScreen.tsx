@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../utils/translator'; 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { apiClient } from '../utils/api'; // 🌟 確実に追加
+import { apiClient } from '../utils/api';
 
 // @ts-ignore
 export default function ReportScreen({ route, navigation }) {

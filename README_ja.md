@@ -35,4 +35,4 @@ RamyaChatは、シンプルなリアルタイムチャットアプリケーシ�
 ## 📄 各種ドキュメント
 
 * [プライバシーポリシー](./PRIVACY_POLICY_ja.md)
-* [ライセンス: MIT](./LICENSE)
+* [ライセンス: MIT](./LICENSE.md)
